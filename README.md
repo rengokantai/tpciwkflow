@@ -33,8 +33,35 @@ expect(assigns(:author)).to be_a_new(Author)
 get :new
 expect(response).to render_template(:new)
 ```
+
+
+#### engine yard
+
+- 3
+######Codeship
+create a ruby proj, then
+```
+bundle exec rake spec:models
+bundle exec rake spec:controllers
+bundle exec rspec
+buncle exec cucumber
+```
+
+syntax review:
+```
+rails g rspec:controller publishers
+```
+######Heroku
+```
+heroku login
+heroku create
+heroku addons:create heroku-postgresql:hobby-dev
+
+heroku apps  #get app name
+heroku run rake db:seed
+```
 - 4  
-Jenkins:  
+######Jenkins:  
 configure global secu->Jenkins own user database(allow users to sign up)  
 Auth->matrix-based secu(add your username)(select all ticks)  
 prevent csrf exploit  
@@ -56,5 +83,51 @@ buildenv->run the build in rvm(ruby@rengokantai)
 then execute shell `gem install bundler --no-ri --no-doc`
 invoke rake  
 
+######test ruby
+install plugins: rubymetrics plugin, xunit  
+set add*build when a change is pushed to github
+
+ADD a script:`export RAILS_ENV=test`
+ADD a invoke rake:
+```
+db:create
+db:schema:load
+```
+Another rake:
+```
+spec SPEC_OPTS="--format RSpecJunitFormatter --out rspec.xml"
+```
+add post-build action:  
+publish rcov report
+publish xunit(add junit pattern)  
+
+in postgres, create a new user:
+```
+su - postgres
+createuser -s jenkins
+```
+
+add three gems:
+```
+gem 'simplecov'
+gem 'simplecov-rcov'
+gem 'rspec_junit_formatter'
+```
+and add to rails_helper.rb
+
+go to github->webhooks->add Jenkinsgithub, add link: http://jenkins/github-webhook  
 
 
+run config/database.yml
+```
+production:
+  adapter: postgresql
+  encoding: unicode
+  pool: 5
+  database: production
+```
+
+then
+```
+cap production deploy
+```
